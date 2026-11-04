@@ -51,3 +51,7 @@ Controleer de JavaScript-syntax en rekenlogica met:
 - node tests/test_boekhouding.js
 
 Deze repository heeft een eigen GitHub Pages-workflow, volledig gescheiden van de horecawebsite.
+
+## Website publiceren
+
+Open https://github.com/paltenburg/boekhouding/settings/pages en zet bij **Build and deployment → Source** op **GitHub Actions**. Daarna kan de workflow `.github/workflows/pages.yml` deze afzonderlijke app publiceren op https://paltenburg.github.io/boekhouding/.
