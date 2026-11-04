@@ -23,20 +23,20 @@ GitHub Pages serveert HTML/CSS/JS openbaar. Bezoekers zien pas financiële gegev
 4. Ga naar https://console.cloud.google.com/auth/clients en maak een OAuth-client van type Web application.
 5. Zet bij Authorized JavaScript origins precies https://paltenburg.github.io (geen pad of laatste /).
 6. De publieke OAuth-client-ID van project Boekhouding is reeds ingesteld in de app; er is geen client secret nodig in de frontend.
-7. Open https://paltenburg.github.io/boekhouding/ en vul alleen de link naar het bestaande spreadsheet in.
+7. Open https://paltenburg.github.io/boekhouding/; het bestaande spreadsheet is al gekoppeld.
 8. Klik op Inloggen met Google. Google vraagt toestemming voor het bewerken van Google Spreadsheets.
-9. Je partner voert alleen de spreadsheetlink eenmalig op haar eigen apparaat in en logt in met haar eigen Google-account.
+9. Je partner logt op haar eigen apparaat in met haar eigen Google-account.
 
 **Let op:** de scope https://www.googleapis.com/auth/spreadsheets geeft deze app, tijdens de sessie, toestemming om Google Spreadsheets van het ingelogde account te lezen en te wijzigen, niet uitsluitend het gekozen spreadsheet. Google ondersteunt geen bestandspecifieke Sheets-scope voor deze eenvoudige bestaande-Sheet-integratie. De app gebruikt die toestemming uitsluitend voor het ingevoerde spreadsheet-ID.
 
-Geen client secret opnemen in GitHub. Er worden geen toegangstokens in localStorage opgeslagen. Alleen het spreadsheet-ID wordt op het betreffende apparaat bewaard. De openbare OAuth-client-ID staat in de appcode.
+Geen client secret opnemen in GitHub. Er worden geen toegangstokens in localStorage opgeslagen. De openbare OAuth-client-ID en het spreadsheet-ID staan in de appcode. Er wordt geen geheime sleutel, toegangstoken of boeking in lokale browseropslag bewaard.
 
 ## Functionaliteit en beperkingen
 
 - Leest bestaande posten uit Sheet1!C1:G999 (kolommen Datum, Omschrijving, Van, Naar, Bedrag).
 - Toont totaal van alle bedragen, plus een richtingssaldo Janne → Popke / Popke → Janne. Ontbrekende richting telt niet mee in het richtingssaldo.
 - Bewerkt uitsluitend de betreffende rij in C:G. De bestaande totaalformule in kolom B blijft intact.
-- Voegt nieuwe regels via de Sheets API toe met INSERT_ROWS, zodat bestaande regels niet worden overschreven.
+- Voegt nieuwe regels atomair toe via spreadsheets.batchUpdate/appendCells, met lege A:B-cellen en de vijf gegevensvelden exact in C:G. Geen table-autodetectie door values.append. Nieuwe bedragen krijgen valutaopmaak.
 - Een rij verwijderen wist C:G zonder de overige rijen te verschuiven; bestaande celdata in deze kolommen gaat dan verloren.
 - Controleert vóór een wijziging of de rij sinds het laatste ophalen is veranderd. Gelijktijdige wijzigingen binnen de tijd tussen controle en schrijven zijn nog niet transactioneel beveiligd.
 - Geen lokale kopie van uitgaven, offline modus, server, automatische achtergrondsynchronisatie of herstelgeschiedenis binnen de app. Google Sheets heeft wel eigen versiegeschiedenis.
