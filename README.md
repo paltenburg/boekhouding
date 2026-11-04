@@ -11,7 +11,7 @@ Statische website op GitHub Pages; de enige bron van bedragen is de bestaande Go
 3. Deel het document rechtstreeks met de twee bedoelde Google-accounts. Geef ze de rol **Bewerker**.
 4. Controleer dat er geen openbare, organisatiebrede of andere onbedoelde toestemming overblijft.
 
-De oorspronkelijke Sheet stond op **iedereen met de link: bewerker**. OAuth alleen maakt die link **niet** privé. De app kan de Google-deelrechten niet wijzigen of afdwingen.
+De Sheet is bij de laatste controle **niet openbaar gedeeld** en heeft alleen de eigenaar en Janne als bewerker. Houd de algemene toegang op **Beperkte toegang**. OAuth alleen maakt een eventueel openbaar gedeeld spreadsheet **niet** privé.
 
 GitHub Pages serveert HTML/CSS/JS openbaar. Bezoekers zien pas financiële gegevens als de Google Sheets API een toegangstoken met geldige machtiging accepteert. De toegangscontrole gebeurt door Google **op het document**; het openbare JavaScript of de OAuth-client-ID zijn geen geheimen.
 
@@ -22,14 +22,14 @@ GitHub Pages serveert HTML/CSS/JS openbaar. Bezoekers zien pas financiële gegev
 3. Configureer Google Auth Platform → Branding en Audience. Kies External bij particuliere Google-accounts; gebruik eventueel Testing en voeg beide Google-accounts toe als testgebruikers.
 4. Ga naar https://console.cloud.google.com/auth/clients en maak een OAuth-client van type Web application.
 5. Zet bij Authorized JavaScript origins precies https://paltenburg.github.io (geen pad of laatste /).
-6. Kopieer alleen de publieke Client ID (eindigt op .apps.googleusercontent.com), niet de client secret.
-7. Open https://paltenburg.github.io/boekhouding/ en vul de client-ID plus de bestaande spreadsheetlink in.
+6. De publieke OAuth-client-ID van project Boekhouding is reeds ingesteld in de app; er is geen client secret nodig in de frontend.
+7. Open https://paltenburg.github.io/boekhouding/ en vul alleen de link naar het bestaande spreadsheet in.
 8. Klik op Inloggen met Google. Google vraagt toestemming voor het bewerken van Google Spreadsheets.
-9. Je partner voert de client-ID en spreadsheetlink ook eenmalig op haar eigen apparaat in en logt in met haar eigen Google-account.
+9. Je partner voert alleen de spreadsheetlink eenmalig op haar eigen apparaat in en logt in met haar eigen Google-account.
 
 **Let op:** de scope https://www.googleapis.com/auth/spreadsheets geeft deze app, tijdens de sessie, toestemming om Google Spreadsheets van het ingelogde account te lezen en te wijzigen, niet uitsluitend het gekozen spreadsheet. Google ondersteunt geen bestandspecifieke Sheets-scope voor deze eenvoudige bestaande-Sheet-integratie. De app gebruikt die toestemming uitsluitend voor het ingevoerde spreadsheet-ID.
 
-Geen client secret opnemen in GitHub. Er worden geen toegangstokens in localStorage opgeslagen. Alleen de client-ID en het spreadsheet-ID worden op het betreffende apparaat bewaard.
+Geen client secret opnemen in GitHub. Er worden geen toegangstokens in localStorage opgeslagen. Alleen het spreadsheet-ID wordt op het betreffende apparaat bewaard. De openbare OAuth-client-ID staat in de appcode.
 
 ## Functionaliteit en beperkingen
 
@@ -54,4 +54,4 @@ Deze repository heeft een eigen GitHub Pages-workflow, volledig gescheiden van d
 
 ## Website publiceren
 
-GitHub Pages gebruikt **GitHub Actions**. Een push naar `main` controleert de Boekhouding-tests en publiceert de site op https://paltenburg.github.io/boekhouding/. De OAuth-koppeling werkt pas nadat de Google OAuth-client in de app is ingesteld en de Google Sheet op **Beperkte toegang** staat.
+GitHub Pages gebruikt **GitHub Actions**. Een push naar `main` controleert de Boekhouding-tests en publiceert de site op https://paltenburg.github.io/boekhouding/. De OAuth-client-ID is al in de app ingesteld. Het spreadsheet staat bij de laatste toegangscontrole op **Beperkte toegang**. Beide Google-accounts moeten toegang hebben en de Sheets API moet in het juiste Google Cloud-project aanstaan.
