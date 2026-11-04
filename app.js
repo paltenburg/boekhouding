@@ -1,13 +1,13 @@
 "use strict";
 (function(){
-  const CONFIG_KEY = "boekhouding-oauth-config-v1";
+  const SPREADSHEET_ID = "1Qu8E69DFp4hvvqtMyGFE_djJ5gqYHb0ufMWOgRYIPu4";
+  const SHEET_GRID_ID = 0; // Verified Google Sheets Sheet1 grid ID.
   // Public OAuth client identifier; never include a client secret in browser code.
   const OAUTH_CLIENT_ID = "863743465904-f094ldsh5fulj0i6lb0snlq7uhg1d9gk.apps.googleusercontent.com";
   const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
   const TAB = "Sheet1";
   const MAX_ROW = 999;
   const money = new Intl.NumberFormat("nl-NL", {style:"currency",currency:"EUR"});
-  let config = {sheetId:""};
   let accessToken = "";
   let accessExpires = 0;
   let tokenClient = null;
@@ -129,34 +129,24 @@
   }
   function setBusy(v){
     busy=v;
-    for(const id of ["connect","disconnect","saveConfig","saveEntry","reload"]){el(id).disabled=v;}
+    for(const id of ["connect","disconnect","saveEntry","reload"]){el(id).disabled=v;}
   }
-  function getConfig(){
-    try{const c=JSON.parse(localStorage.getItem(CONFIG_KEY)||"{}");if(c && typeof c==="object")return {sheetId:String(c.sheetId||"")};}catch(_e){}
-    return {sheetId:""};
-  }
-  function showConfig(){
-    el("sheetUrl").value=config.sheetId;
-    const valid=!!config.sheetId;
-    el("configState").textContent=valid?"Ingesteld op dit apparaat":"Nog niet ingesteld";
-    if(valid)el("setup").open=false;
-  }
-  function saveConfig(){
-    const sheetId=sheetIdFrom(el("sheetUrl").value);
-    if(!sheetId){say("Vul een geldige URL of ID van een Google Spreadsheet in.","error");return;}
-    if(!confirm("Heb je bij het spreadsheet Algemene toegang op 'Beperkte toegang' gezet en alleen jullie twee Google-accounts expliciet toegang gegeven? De app kan dit niet zelfstandig controleren."))return;
-    config={sheetId};
-    try{localStorage.setItem(CONFIG_KEY,JSON.stringify(config));}
-    catch(_e){say("Configuratie kan niet worden opgeslagen in deze browser.","error");return;}
-    disconnect(false);
-    showConfig();say("Configuratie bewaard op dit apparaat. Log in met Google.");
+  // Unlike values.append, appendCells never guesses the first column of a table.
+  function buildAppendRequest(date,description,from,to,amount){
+    const text = value => ({userEnteredValue:{stringValue:String(value)}});
+    return {appendCells:{
+      sheetId:SHEET_GRID_ID,
+      rows:[{values:[{}, {}, text(date), text(description), text(from), text(to),
+        {userEnteredValue:{numberValue:amount}}]}],
+      fields:"userEnteredValue"
+    }};
   }
   async function api(path, options={}){
     if(!accessToken || Date.now()>accessExpires){
       throw Error("Je Google-sessie is verlopen. Log opnieuw in.");
     }
-    const base="https://sheets.googleapis.com/v4/spreadsheets/"+encodeURIComponent(config.sheetId)+"/";
-    const response=await fetch(base+path,{
+    const root="https://sheets.googleapis.com/v4/spreadsheets/"+encodeURIComponent(SPREADSHEET_ID);
+    const response=await fetch(root+(path.startsWith(":")?path:"/"+path),{
       ...options,cache:"no-store",
       headers:{"Authorization":"Bearer "+accessToken,"Content-Type":"application/json",...(options.headers||{})}
     });
@@ -193,9 +183,6 @@
     }finally{setBusy(false);}
   }
   function connect(){
-    if(!config.sheetId){
-      el("setup").open=true;say("Vul eerst de OAuth-client-ID en spreadsheetlink in.","error");return;
-    }
     if(!window.google || !window.google.accounts || !window.google.accounts.oauth2){
       say("Google-aanmelding is nog niet geladen of wordt geblokkeerd door je browser. Probeer opnieuw of sta accounts.google.com toe.","error");return;
     }
@@ -250,9 +237,10 @@
         await api(path,{method:"PUT",body:JSON.stringify({range:"'"+TAB+"'!C"+editing.rowNumber+":G"+editing.rowNumber,majorDimension:"ROWS",values})});
         say("Post bijgewerkt in Google Sheets.","success");
       }else{
-        // INSERT_ROWS never overwrites an existing row even if a blank separates two tables.
-        const path=rangeValueUrl("C1:G"+MAX_ROW)+":append?valueInputOption=RAW&insertDataOption=INSERT_ROWS";
-        await api(path,{method:"POST",body:JSON.stringify({majorDimension:"ROWS",values})});
+        // One atomic append of a full A:G row: A/B empty, C:G correctly aligned.
+        await api(":batchUpdate",{method:"POST",body:JSON.stringify({requests:[
+          buildAppendRequest(date,description,from,to,amount)
+        ]})});
         say("Nieuwe post toegevoegd aan Google Sheets.","success");
       }
       // Release busy so loadData may fetch the just-written row.
@@ -271,18 +259,17 @@
     }catch(error){say(error.message,"error");setBusy(false);}
   }
   function init(){
-    config=getConfig();showConfig();editorReset();
-    el("saveConfig").addEventListener("click",saveConfig);
+    editorReset();
     el("connect").addEventListener("click",connect);
     el("disconnect").addEventListener("click",()=>disconnect(true));
     el("entryForm").addEventListener("submit",saveEntry);
     el("cancelEdit").addEventListener("click",editorReset);
     el("search").addEventListener("input",displayEntries);
     el("reload").addEventListener("click",loadData);
-    if(config.sheetId)say("Spreadsheet gevonden in lokale instellingen. Log in met Google om de actuele posten te openen.");
+    say("Het spreadsheet is gekoppeld. Log in met Google om de actuele posten te openen.");
   }
   if(typeof module!=="undefined" && module.exports){
-    module.exports={parseMoney,sheetIdFrom,rowFromValues,sameRow,direction};
+    module.exports={parseMoney,sheetIdFrom,rowFromValues,sameRow,direction,buildAppendRequest};
   }
   if(typeof document!=="undefined")init();
 })();
