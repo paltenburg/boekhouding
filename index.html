@@ -29,23 +29,12 @@
     <p><a href="https://support.google.com/drive/answer/2494822" target="_blank" rel="noopener noreferrer">Uitleg Google over delen</a></p>
   </section>
 
-  <details class="panel setup" id="setup" open>
-    <summary>Spreadsheet koppelen <span id="configState" class="muted">Nog niet ingesteld</span></summary>
-    <p class="muted">De Google OAuth-client-ID is al ingesteld. Vul alleen de link naar jullie spreadsheet in. De link wordt alleen op dit apparaat opgeslagen.</p>
-    <div class="setup-grid">
-      <label>Google Sheet-link of spreadsheet-ID
-        <input id="sheetUrl" type="text" spellcheck="false" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/…/edit">
-      </label>
-    </div>
-    <div class="row">
-      <button id="saveConfig" type="button">Configuratie bewaren</button>
-      <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener noreferrer">Google Cloud: OAuth-clients</a>
-      <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com" target="_blank" rel="noopener noreferrer">Sheets API inschakelen</a>
-    </div>
-    <p class="hint">Google OAuth gebruikt de toegestane JavaScript-origin <code>https://paltenburg.github.io</code>. De Sheets API moet ingeschakeld zijn en beide Google-accounts moeten (indien de OAuth-app in testmodus staat) als testgebruikers toegevoegd zijn. De app gebruikt geen client secret.</p>
-  </details>
+  <div class="panel" style="margin-bottom:15px">
+    <strong>Gekoppeld spreadsheet:</strong> <a href="https://docs.google.com/spreadsheets/d/1Qu8E69DFp4hvvqtMyGFE_djJ5gqYHb0ufMWOgRYIPu4/edit" target="_blank" rel="noopener noreferrer">Janne Boekhouding openen ↗</a>
+    <p class="hint">De koppeling is al ingesteld. Log in met je eigen Google-account om de gegevens te bekijken en te wijzigen.</p>
+  </div>
 
-  <div id="message" class="message" role="status" aria-live="polite">Configureer de app en log in met Google.</div>
+  <div id="message" class="message" role="status" aria-live="polite">Log in met Google om de boekhouding te openen.</div>
 
   <section id="workspace" hidden>
     <div class="stats">
