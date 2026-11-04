@@ -23,20 +23,16 @@
   </header>
 
   <section class="warning" aria-labelledby="privacyHeading">
-    <h2 id="privacyHeading">Eerst privé maken</h2>
-    <p>De bestaande Google Sheet had de instelling <strong>‘Iedereen met de link — Bewerker’</strong>.
-    Zet bij Google Sheets → Delen → Algemene toegang de instelling op <strong>Beperkte toegang</strong> en geef alleen jullie eigen accounts toegang.
-    OAuth beschermt niet tegen een rechtstreeks openbaar gedeeld spreadsheet.</p>
+    <h2 id="privacyHeading">Toegangsrechten via Google</h2>
+    <p>De boekhouding wordt beveiligd door de deelrechten van Google Sheets. Houd het document op <strong>Beperkte toegang</strong> en deel het alleen met jullie eigen accounts.
+    De pagina zelf is openbaar, maar kan zonder Google-toestemming geen bedragen ophalen.</p>
     <p><a href="https://support.google.com/drive/answer/2494822" target="_blank" rel="noopener noreferrer">Uitleg Google over delen</a></p>
   </section>
 
   <details class="panel setup" id="setup" open>
-    <summary>Eenmalige configuratie <span id="configState" class="muted">Nog niet ingesteld</span></summary>
-    <p class="muted">Google Cloud OAuth-client-ID en de link naar jullie spreadsheet. Deze twee instellingen worden alleen op dit apparaat opgeslagen. Dit zijn geen wachtwoorden of geheime sleutels.</p>
+    <summary>Spreadsheet koppelen <span id="configState" class="muted">Nog niet ingesteld</span></summary>
+    <p class="muted">De Google OAuth-client-ID is al ingesteld. Vul alleen de link naar jullie spreadsheet in. De link wordt alleen op dit apparaat opgeslagen.</p>
     <div class="setup-grid">
-      <label>OAuth-client-ID
-        <input id="clientId" type="text" spellcheck="false" autocomplete="off" placeholder="…apps.googleusercontent.com">
-      </label>
       <label>Google Sheet-link of spreadsheet-ID
         <input id="sheetUrl" type="text" spellcheck="false" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/…/edit">
       </label>
@@ -46,7 +42,7 @@
       <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener noreferrer">Google Cloud: OAuth-clients</a>
       <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com" target="_blank" rel="noopener noreferrer">Sheets API inschakelen</a>
     </div>
-    <p class="hint">Gebruik een OAuth-client van type <strong>Web application</strong> met toegestane JavaScript-origin <code>https://paltenburg.github.io</code>. Stel het toestemmingsscherm in en voeg beide Google-accounts als testgebruikers toe. Nooit een client secret invullen.</p>
+    <p class="hint">Google OAuth gebruikt de toegestane JavaScript-origin <code>https://paltenburg.github.io</code>. De Sheets API moet ingeschakeld zijn en beide Google-accounts moeten (indien de OAuth-app in testmodus staat) als testgebruikers toegevoegd zijn. De app gebruikt geen client secret.</p>
   </details>
 
   <div id="message" class="message" role="status" aria-live="polite">Configureer de app en log in met Google.</div>
