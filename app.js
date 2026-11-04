@@ -1,11 +1,13 @@
 "use strict";
 (function(){
   const CONFIG_KEY = "boekhouding-oauth-config-v1";
+  // Public OAuth client identifier; never include a client secret in browser code.
+  const OAUTH_CLIENT_ID = "863743465904-f094ldsh5fulj0i6lb0snlq7uhg1d9gk.apps.googleusercontent.com";
   const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
   const TAB = "Sheet1";
   const MAX_ROW = 999;
   const money = new Intl.NumberFormat("nl-NL", {style:"currency",currency:"EUR"});
-  let config = {clientId:"",sheetId:""};
+  let config = {sheetId:""};
   let accessToken = "";
   let accessExpires = 0;
   let tokenClient = null;
@@ -130,24 +132,20 @@
     for(const id of ["connect","disconnect","saveConfig","saveEntry","reload"]){el(id).disabled=v;}
   }
   function getConfig(){
-    try{const c=JSON.parse(localStorage.getItem(CONFIG_KEY)||"{}");if(c && typeof c==="object")return {clientId:String(c.clientId||""),sheetId:String(c.sheetId||"")};}catch(_e){}
-    return {clientId:"",sheetId:""};
+    try{const c=JSON.parse(localStorage.getItem(CONFIG_KEY)||"{}");if(c && typeof c==="object")return {sheetId:String(c.sheetId||"")};}catch(_e){}
+    return {sheetId:""};
   }
   function showConfig(){
-    el("clientId").value=config.clientId;el("sheetUrl").value=config.sheetId;
-    const valid=!!(config.clientId && config.sheetId);
+    el("sheetUrl").value=config.sheetId;
+    const valid=!!config.sheetId;
     el("configState").textContent=valid?"Ingesteld op dit apparaat":"Nog niet ingesteld";
     if(valid)el("setup").open=false;
   }
   function saveConfig(){
-    const clientId=el("clientId").value.trim();
     const sheetId=sheetIdFrom(el("sheetUrl").value);
-    if(!/^[a-zA-Z0-9._-]+\.apps\.googleusercontent\.com$/.test(clientId)){
-      say("De OAuth-client-ID is ongeldig. Maak een Web application-client aan in Google Cloud; gebruik niet de client secret.","error");return;
-    }
     if(!sheetId){say("Vul een geldige URL of ID van een Google Spreadsheet in.","error");return;}
     if(!confirm("Heb je bij het spreadsheet Algemene toegang op 'Beperkte toegang' gezet en alleen jullie twee Google-accounts expliciet toegang gegeven? De app kan dit niet zelfstandig controleren."))return;
-    config={clientId,sheetId};
+    config={sheetId};
     try{localStorage.setItem(CONFIG_KEY,JSON.stringify(config));}
     catch(_e){say("Configuratie kan niet worden opgeslagen in deze browser.","error");return;}
     disconnect(false);
@@ -195,7 +193,7 @@
     }finally{setBusy(false);}
   }
   function connect(){
-    if(!config.clientId || !config.sheetId){
+    if(!config.sheetId){
       el("setup").open=true;say("Vul eerst de OAuth-client-ID en spreadsheetlink in.","error");return;
     }
     if(!window.google || !window.google.accounts || !window.google.accounts.oauth2){
@@ -203,7 +201,7 @@
     }
     try{
       tokenClient=window.google.accounts.oauth2.initTokenClient({
-        client_id:config.clientId,scope:SCOPE,
+        client_id:OAUTH_CLIENT_ID,scope:SCOPE,
         callback:async response=>{
           if(response.error || !response.access_token){say("Google heeft geen toegang verleend: "+(response.error||"Onbekende fout"),"error");return;}
           accessToken=response.access_token;
@@ -281,7 +279,7 @@
     el("cancelEdit").addEventListener("click",editorReset);
     el("search").addEventListener("input",displayEntries);
     el("reload").addEventListener("click",loadData);
-    if(config.clientId&&config.sheetId)say("Configuratie gevonden. Log in met Google om de actuele posten te openen.");
+    if(config.sheetId)say("Spreadsheet gevonden in lokale instellingen. Log in met Google om de actuele posten te openen.");
   }
   if(typeof module!=="undefined" && module.exports){
     module.exports={parseMoney,sheetIdFrom,rowFromValues,sameRow,direction};
