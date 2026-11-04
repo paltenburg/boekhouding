@@ -134,11 +134,14 @@
   // Unlike values.append, appendCells never guesses the first column of a table.
   function buildAppendRequest(date,description,from,to,amount){
     const text = value => ({userEnteredValue:{stringValue:String(value)}});
+    const amountCell={
+      userEnteredValue:{numberValue:amount},
+      userEnteredFormat:{numberFormat:{type:"CURRENCY",pattern:"[$€]#,##0.00"}}
+    };
     return {appendCells:{
       sheetId:SHEET_GRID_ID,
-      rows:[{values:[{}, {}, text(date), text(description), text(from), text(to),
-        {userEnteredValue:{numberValue:amount}}]}],
-      fields:"userEnteredValue"
+      rows:[{values:[{}, {}, text(date), text(description), text(from), text(to), amountCell]}],
+      fields:"userEnteredValue,userEnteredFormat.numberFormat"
     }};
   }
   async function api(path, options={}){
