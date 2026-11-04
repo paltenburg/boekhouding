@@ -54,4 +54,4 @@ Deze repository heeft een eigen GitHub Pages-workflow, volledig gescheiden van d
 
 ## Website publiceren
 
-Open https://github.com/paltenburg/boekhouding/settings/pages en zet bij **Build and deployment → Source** op **GitHub Actions**. Daarna kan de workflow `.github/workflows/pages.yml` deze afzonderlijke app publiceren op https://paltenburg.github.io/boekhouding/.
+GitHub Pages gebruikt **GitHub Actions**. Een push naar `main` controleert de Boekhouding-tests en publiceert de site op https://paltenburg.github.io/boekhouding/. De OAuth-koppeling werkt pas nadat de Google OAuth-client in de app is ingesteld en de Google Sheet op **Beperkte toegang** staat.
