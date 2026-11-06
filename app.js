@@ -200,7 +200,7 @@
         },
         error_callback: error=>say("Google-inloggen is afgebroken of geblokkeerd: "+(error.type||"Onbekende fout"),"error")
       });
-      tokenClient.requestAccessToken({prompt:"consent"});
+      tokenClient.requestAccessToken({prompt:"select_account"});
     }catch(error){say("Google OAuth kon niet starten: "+error.message,"error");}
   }
   function disconnect(revoke=true){
